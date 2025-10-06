@@ -1,0 +1,35 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/ 
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+
+# Environment files
+.env
+.env.*
+
+# OS files
+.DS_Store
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+
+# Local data/cache
+*.sqlite3
+
+# Archives
+*.zip
+
+# Cursor/IDE
+.vscode/
+.idea/
+
+# Project-specific
+scripts/__pycache__/

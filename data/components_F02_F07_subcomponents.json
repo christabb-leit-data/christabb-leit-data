@@ -1,0 +1,42 @@
+[
+  {
+    "component_pattern": "F.04 – Storage and Compute",
+    "component_title": "F.04 – Storage and Compute",
+    "component_id": "2690545549343",
+    "subcomponent_title": "F.04.1 – Data Lake Storage",
+    "subcomponent_id": "",
+    "subcomponent_code": "F.04.1"
+  },
+  {
+    "component_pattern": "F.04 – Storage and Compute",
+    "component_title": "F.04 – Storage and Compute", 
+    "component_id": "2690545549343",
+    "subcomponent_title": "F.04.2 – Data Warehouse Storage",
+    "subcomponent_id": "",
+    "subcomponent_code": "F.04.2"
+  },
+  {
+    "component_pattern": "F.04 – Storage and Compute",
+    "component_title": "F.04 – Storage and Compute",
+    "component_id": "2690545549343", 
+    "subcomponent_title": "F.04.3 – Compute Resources",
+    "subcomponent_id": "",
+    "subcomponent_code": "F.04.3"
+  },
+  {
+    "component_pattern": "F.05 – Data Modelling and Data Model Management",
+    "component_title": "F.05 – Data Modelling and Data Model Management",
+    "component_id": "2690545483829",
+    "subcomponent_title": "F.05.1 – Data Model Design",
+    "subcomponent_id": "",
+    "subcomponent_code": "F.05.1"
+  },
+  {
+    "component_pattern": "F.05 – Data Modelling and Data Model Management", 
+    "component_title": "F.05 – Data Modelling and Data Model Management",
+    "component_id": "2690545483829",
+    "subcomponent_title": "F.05.2 – Data Model Governance",
+    "subcomponent_id": "",
+    "subcomponent_code": "F.05.2"
+  }
+]
