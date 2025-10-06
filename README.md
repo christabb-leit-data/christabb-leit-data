@@ -1,3 +1,5 @@
+[See INDEX.md for a concise entry-point to all files.](./INDEX.md)
+
 
 # F.02–F.07 Discovery + Seed Generator
 
