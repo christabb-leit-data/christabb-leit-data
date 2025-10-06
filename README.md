@@ -61,4 +61,4 @@ python run.py --root-id <ROOT_PAGE_ID> --only-types Tasks --inject-tasks --updat
 ## Notes
 - Titles use en-dash; the discovery script tolerates hyphen variants.
 - If Confluence component titles differ (e.g., “F.04 – Storage & Compute” vs “Storage and Compute”), add their page IDs in `data/parent_overrides.json`.
-- Edit the generated CSVs to replace reference defaults with **your exact options & tasks** where the blueprint defines them.
+- Edit the generated CSVs to replace reference defaults with **your exact options & tasks** where the blueprint defines them. Add info.
