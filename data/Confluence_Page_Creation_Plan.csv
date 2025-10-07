@@ -1,78 +1,27 @@
 Parent Page,Page Title,Page Type,Code / Ref,Description / Notes,Complexity,Mode Applicability,Validation / Cleanup Flag,Labels,Recommended Action
-F.01 – Ingest,F.01.2 – API Ingestion,Subcomponent,F.01.2,Implementation subcomponent for F.01 – Ingest,,,,blueprint;subcomponent;F.01,Create if missing
-F.01.2 – API Ingestion,F.01.2.A – Option A Implementation,Option,F.01.2.A,Implementation option for F.01.2 – API Ingestion,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.01,Create
-F.01.2.A – Option A Implementation,Tasks – F.01.2.A,Tasks,F.01.2.A,Tasks filtered by OptionRef=F.01.2.A.,,,,blueprint;tasks;F.01,Create
-F.01.2 – API Ingestion,F.01.2.B – Option B Implementation,Option,F.01.2.B,Implementation option for F.01.2 – API Ingestion,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.01,Create
-F.01.2.B – Option B Implementation,Tasks – F.01.2.B,Tasks,F.01.2.B,Tasks filtered by OptionRef=F.01.2.B.,,,,blueprint;tasks;F.01,Create
-F.01.2 – API Ingestion,F.01.2.C – Option C Implementation,Option,F.01.2.C,Implementation option for F.01.2 – API Ingestion,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.01,Create
-F.01.2.C – Option C Implementation,Tasks – F.01.2.C,Tasks,F.01.2.C,Tasks filtered by OptionRef=F.01.2.C.,,,,blueprint;tasks;F.01,Create
-F.01 – Ingest,F.01.3 – Data Share Ingestion,Subcomponent,F.01.3,Implementation subcomponent for F.01 – Ingest,,,,blueprint;subcomponent;F.01,Create if missing
-F.01.3 – Data Share Ingestion,F.01.3.A – Option A Implementation,Option,F.01.3.A,Implementation option for F.01.3 – Data Share Ingestion,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.01,Create
-F.01.3.A – Option A Implementation,Tasks – F.01.3.A,Tasks,F.01.3.A,Tasks filtered by OptionRef=F.01.3.A.,,,,blueprint;tasks;F.01,Create
-F.01.3 – Data Share Ingestion,F.01.3.B – Option B Implementation,Option,F.01.3.B,Implementation option for F.01.3 – Data Share Ingestion,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.01,Create
-F.01.3.B – Option B Implementation,Tasks – F.01.3.B,Tasks,F.01.3.B,Tasks filtered by OptionRef=F.01.3.B.,,,,blueprint;tasks;F.01,Create
-F.01.3 – Data Share Ingestion,F.01.3.C – Option C Implementation,Option,F.01.3.C,Implementation option for F.01.3 – Data Share Ingestion,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.01,Create
-F.01.3.C – Option C Implementation,Tasks – F.01.3.C,Tasks,F.01.3.C,Tasks filtered by OptionRef=F.01.3.C.,,,,blueprint;tasks;F.01,Create
-F.02 – Orchestration,F.02.1 – Workflow Definition & Management,Subcomponent,F.02.1,Implementation subcomponent for F.02 – Orchestration,,,,blueprint;subcomponent;F.02,Create if missing
-F.02.1 – Workflow Definition & Management,F.02.1.A – Option A Implementation,Option,F.02.1.A,Implementation option for F.02.1 – Workflow Definition & Management,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.02,Create
-F.02.1.A – Option A Implementation,Tasks – F.02.1.A,Tasks,F.02.1.A,Tasks filtered by OptionRef=F.02.1.A.,,,,blueprint;tasks;F.02,Create
-F.02.1 – Workflow Definition & Management,F.02.1.B – Option B Implementation,Option,F.02.1.B,Implementation option for F.02.1 – Workflow Definition & Management,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.02,Create
-F.02.1.B – Option B Implementation,Tasks – F.02.1.B,Tasks,F.02.1.B,Tasks filtered by OptionRef=F.02.1.B.,,,,blueprint;tasks;F.02,Create
-F.02.1 – Workflow Definition & Management,F.02.1.C – Option C Implementation,Option,F.02.1.C,Implementation option for F.02.1 – Workflow Definition & Management,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.02,Create
-F.02.1.C – Option C Implementation,Tasks – F.02.1.C,Tasks,F.02.1.C,Tasks filtered by OptionRef=F.02.1.C.,,,,blueprint;tasks;F.02,Create
-F.03 – Transformation,F.03.1 – Data Cleaning,Subcomponent,F.03.1,Implementation subcomponent for F.03 – Transformation,,,,blueprint;subcomponent;F.03,Create if missing
-F.03.1 – Data Cleaning,F.03.1.A – Option A Implementation,Option,F.03.1.A,Implementation option for F.03.1 – Data Cleaning,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.03,Create
-F.03.1.A – Option A Implementation,Tasks – F.03.1.A,Tasks,F.03.1.A,Tasks filtered by OptionRef=F.03.1.A.,,,,blueprint;tasks;F.03,Create
-F.03.1 – Data Cleaning,F.03.1.B – Option B Implementation,Option,F.03.1.B,Implementation option for F.03.1 – Data Cleaning,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.03,Create
-F.03.1.B – Option B Implementation,Tasks – F.03.1.B,Tasks,F.03.1.B,Tasks filtered by OptionRef=F.03.1.B.,,,,blueprint;tasks;F.03,Create
-F.03.1 – Data Cleaning,F.03.1.C – Option C Implementation,Option,F.03.1.C,Implementation option for F.03.1 – Data Cleaning,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.03,Create
-F.03.1.C – Option C Implementation,Tasks – F.03.1.C,Tasks,F.03.1.C,Tasks filtered by OptionRef=F.03.1.C.,,,,blueprint;tasks;F.03,Create
-F.03 – Transformation,F.03.2 – Data Enrichment,Subcomponent,F.03.2,Implementation subcomponent for F.03 – Transformation,,,,blueprint;subcomponent;F.03,Create if missing
-F.03.2 – Data Enrichment,F.03.2.A – Option A Implementation,Option,F.03.2.A,Implementation option for F.03.2 – Data Enrichment,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.03,Create
-F.03.2.A – Option A Implementation,Tasks – F.03.2.A,Tasks,F.03.2.A,Tasks filtered by OptionRef=F.03.2.A.,,,,blueprint;tasks;F.03,Create
-F.03.2 – Data Enrichment,F.03.2.B – Option B Implementation,Option,F.03.2.B,Implementation option for F.03.2 – Data Enrichment,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.03,Create
-F.03.2.B – Option B Implementation,Tasks – F.03.2.B,Tasks,F.03.2.B,Tasks filtered by OptionRef=F.03.2.B.,,,,blueprint;tasks;F.03,Create
-F.03.2 – Data Enrichment,F.03.2.C – Option C Implementation,Option,F.03.2.C,Implementation option for F.03.2 – Data Enrichment,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.03,Create
-F.03.2.C – Option C Implementation,Tasks – F.03.2.C,Tasks,F.03.2.C,Tasks filtered by OptionRef=F.03.2.C.,,,,blueprint;tasks;F.03,Create
-F.04 – Storage and Compute,F.04.2 – Curated / Silver Layer,Subcomponent,F.04.2,Implementation subcomponent for F.04 – Storage and Compute,,,,blueprint;subcomponent;F.04,Create if missing
-F.04.2 – Curated / Silver Layer,F.04.2.A – Option A Implementation,Option,F.04.2.A,Implementation option for F.04.2 – Curated / Silver Layer,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.04,Create
-F.04.2.A – Option A Implementation,Tasks – F.04.2.A,Tasks,F.04.2.A,Tasks filtered by OptionRef=F.04.2.A.,,,,blueprint;tasks;F.04,Create
-F.04.2 – Curated / Silver Layer,F.04.2.B – Option B Implementation,Option,F.04.2.B,Implementation option for F.04.2 – Curated / Silver Layer,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.04,Create
-F.04.2.B – Option B Implementation,Tasks – F.04.2.B,Tasks,F.04.2.B,Tasks filtered by OptionRef=F.04.2.B.,,,,blueprint;tasks;F.04,Create
-F.04.2 – Curated / Silver Layer,F.04.2.C – Option C Implementation,Option,F.04.2.C,Implementation option for F.04.2 – Curated / Silver Layer,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.04,Create
-F.04.2.C – Option C Implementation,Tasks – F.04.2.C,Tasks,F.04.2.C,Tasks filtered by OptionRef=F.04.2.C.,,,,blueprint;tasks;F.04,Create
-F.06 – Data Delivery,F.06.1 – API,Subcomponent,F.06.1,Implementation subcomponent for F.06 – Data Delivery,,,,blueprint;subcomponent;F.06,Create if missing
-F.06.1 – API,F.06.1.A – Option A Implementation,Option,F.06.1.A,Implementation option for F.06.1 – API,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.06,Create
-F.06.1.A – Option A Implementation,Tasks – F.06.1.A,Tasks,F.06.1.A,Tasks filtered by OptionRef=F.06.1.A.,,,,blueprint;tasks;F.06,Create
-F.06.1 – API,F.06.1.B – Option B Implementation,Option,F.06.1.B,Implementation option for F.06.1 – API,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.06,Create
-F.06.1.B – Option B Implementation,Tasks – F.06.1.B,Tasks,F.06.1.B,Tasks filtered by OptionRef=F.06.1.B.,,,,blueprint;tasks;F.06,Create
-F.06.1 – API,F.06.1.C – Option C Implementation,Option,F.06.1.C,Implementation option for F.06.1 – API,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.06,Create
-F.06.1.C – Option C Implementation,Tasks – F.06.1.C,Tasks,F.06.1.C,Tasks filtered by OptionRef=F.06.1.C.,,,,blueprint;tasks;F.06,Create
-F.06 – Data Delivery,F.06.4 – Data Apps,Subcomponent,F.06.4,Implementation subcomponent for F.06 – Data Delivery,,,,blueprint;subcomponent;F.06,Create if missing
-F.06.4 – Data Apps,F.06.4.A – Option A Implementation,Option,F.06.4.A,Implementation option for F.06.4 – Data Apps,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.06,Create
-F.06.4.A – Option A Implementation,Tasks – F.06.4.A,Tasks,F.06.4.A,Tasks filtered by OptionRef=F.06.4.A.,,,,blueprint;tasks;F.06,Create
-F.06.4 – Data Apps,F.06.4.B – Option B Implementation,Option,F.06.4.B,Implementation option for F.06.4 – Data Apps,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.06,Create
-F.06.4.B – Option B Implementation,Tasks – F.06.4.B,Tasks,F.06.4.B,Tasks filtered by OptionRef=F.06.4.B.,,,,blueprint;tasks;F.06,Create
-F.06.4 – Data Apps,F.06.4.C – Option C Implementation,Option,F.06.4.C,Implementation option for F.06.4 – Data Apps,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.06,Create
-F.06.4.C – Option C Implementation,Tasks – F.06.4.C,Tasks,F.06.4.C,Tasks filtered by OptionRef=F.06.4.C.,,,,blueprint;tasks;F.06,Create
-F.07 – AI/ML,F.07.1 – Generative AI,Subcomponent,F.07.1,Implementation subcomponent for F.07 – AI/ML,,,,blueprint;subcomponent;F.07,Create if missing
-F.07.1 – Generative AI,F.07.1.A – Option A Implementation,Option,F.07.1.A,Implementation option for F.07.1 – Generative AI,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.07,Create
-F.07.1.A – Option A Implementation,Tasks – F.07.1.A,Tasks,F.07.1.A,Tasks filtered by OptionRef=F.07.1.A.,,,,blueprint;tasks;F.07,Create
-F.07.1 – Generative AI,F.07.1.B – Option B Implementation,Option,F.07.1.B,Implementation option for F.07.1 – Generative AI,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.07,Create
-F.07.1.B – Option B Implementation,Tasks – F.07.1.B,Tasks,F.07.1.B,Tasks filtered by OptionRef=F.07.1.B.,,,,blueprint;tasks;F.07,Create
-F.07.1 – Generative AI,F.07.1.C – Option C Implementation,Option,F.07.1.C,Implementation option for F.07.1 – Generative AI,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.07,Create
-F.07.1.C – Option C Implementation,Tasks – F.07.1.C,Tasks,F.07.1.C,Tasks filtered by OptionRef=F.07.1.C.,,,,blueprint;tasks;F.07,Create
-F.07 – AI/ML,F.07.3 – Notebooks (Data Science Workspaces),Subcomponent,F.07.3,Implementation subcomponent for F.07 – AI/ML,,,,blueprint;subcomponent;F.07,Create if missing
-F.07.3 – Notebooks (Data Science Workspaces),F.07.3.A – Option A Implementation,Option,F.07.3.A,Implementation option for F.07.3 – Notebooks (Data Science Workspaces),Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.07,Create
-F.07.3.A – Option A Implementation,Tasks – F.07.3.A,Tasks,F.07.3.A,Tasks filtered by OptionRef=F.07.3.A.,,,,blueprint;tasks;F.07,Create
-F.07.3 – Notebooks (Data Science Workspaces),F.07.3.B – Option B Implementation,Option,F.07.3.B,Implementation option for F.07.3 – Notebooks (Data Science Workspaces),Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.07,Create
-F.07.3.B – Option B Implementation,Tasks – F.07.3.B,Tasks,F.07.3.B,Tasks filtered by OptionRef=F.07.3.B.,,,,blueprint;tasks;F.07,Create
-F.07.3 – Notebooks (Data Science Workspaces),F.07.3.C – Option C Implementation,Option,F.07.3.C,Implementation option for F.07.3 – Notebooks (Data Science Workspaces),Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.07,Create
-F.07.3.C – Option C Implementation,Tasks – F.07.3.C,Tasks,F.07.3.C,Tasks filtered by OptionRef=F.07.3.C.,,,,blueprint;tasks;F.07,Create
-F.12 – Data Management,F.12.2 – Data Management,Subcomponent,F.12.2,Implementation subcomponent for F.12 – Data Management,,,,blueprint;subcomponent;F.12,Create if missing
-F.12.2 – Data Management,F.12.2.A – Option A Implementation,Option,F.12.2.A,Implementation option for F.12.2 – Data Management,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.12,Create
-F.12.2.A – Option A Implementation,Tasks – F.12.2.A,Tasks,F.12.2.A,Tasks filtered by OptionRef=F.12.2.A.,,,,blueprint;tasks;F.12,Create
-F.12.2 – Data Management,F.12.2.B – Option B Implementation,Option,F.12.2.B,Implementation option for F.12.2 – Data Management,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.12,Create
-F.12.2.B – Option B Implementation,Tasks – F.12.2.B,Tasks,F.12.2.B,Tasks filtered by OptionRef=F.12.2.B.,,,,blueprint;tasks;F.12,Create
-F.12.2 – Data Management,F.12.2.C – Option C Implementation,Option,F.12.2.C,Implementation option for F.12.2 – Data Management,Medium,"MVP,Production,Enterprise",Pending,blueprint;option;F.12,Create
-F.12.2.C – Option C Implementation,Tasks – F.12.2.C,Tasks,F.12.2.C,Tasks filtered by OptionRef=F.12.2.C.,,,,blueprint;tasks;F.12,Create
+F.01 – Ingest,F.01.1 – CDC Ingestion,Subcomponent,F.01.1,"**Purpose.** Continuously replicate source database changes (inserts, updates, deletes) into Snowflake with low latency so downstream models always work from current data.
+
+**Scope.** CDC is used for operational sources that expose changelogs (e.g., WAL/binlog/redo) or change tables. It complements batch loads (F.01.4) and streaming events (F.01.5).
+
+**Options available (implemented as sub‑pages):**
+- **F.01.1.A – SaaS CDC Connector:** Managed log‑based replication service into Snowflake (fastest path, low ops).
+- **F.01.1.B – Open‑Source CDC Pipeline:** Debezium/Kafka (or equivalent) streaming into Snowflake for full control.
+- **F.01.1.C – Custom CDC via Log Shipping:** Bespoke log parsing + apply for niche/complex sources.
+
+**Non‑goals.** Point‑in‑time full reloads (covered by F.01.4 batch) and API‑push ingestion (F.01.2).
+",,,Viable,blueprint;subcomponent;F.01,Create or Update
+F.01.1 – CDC Ingestion,F.01.1.A – SaaS CDC Connector,Option,F.01.1.A,"**What it is.** A managed CDC service (e.g., Fivetran/HVR/Qlik Replicate‑as‑a‑Service) reads source DB logs and continuously lands changes into Snowflake.
+**Why choose it.** Fastest path to CDC with minimal code and strong vendor monitoring; ideal for MVP and many production cases.
+**Trade‑offs.** Ongoing license/usage costs and less flexibility for unusual sources or edge‑case transformations.
+",Medium,MVP:✅ Prod:✅ Ent:✅,Viable,blueprint;option;F.01,Create or Update
+F.01.1.A – SaaS CDC Connector,Tasks – F.01.1.A,Tasks,F.01.1.A,Tasks filtered by OptionRef=F.01.1.A.,,,,blueprint;tasks;F.01,Create or Update
+F.01.1 – CDC Ingestion,F.01.1.B – Open‑Source CDC Pipeline,Option,F.01.1.B,"**What it is.** An in‑house CDC pipeline built on open‑source (e.g., Debezium + Kafka + Snowflake sink/Snowpipe Streaming).
+**Why choose it.** Maximum control over throughput, schema evolution, routing, and replay; avoids vendor lock‑in.
+**Trade‑offs.** Higher engineering and DevOps overhead to operate reliably at scale.
+",High,MVP:❌ Prod:✅ Ent:✅,Viable,blueprint;option;F.01,Create or Update
+F.01.1.B – Open‑Source CDC Pipeline,Tasks – F.01.1.B,Tasks,F.01.1.B,Tasks filtered by OptionRef=F.01.1.B.,,,,blueprint;tasks;F.01,Create or Update
+F.01.1 – CDC Ingestion,F.01.1.C – Custom CDC via Log Shipping,Option,F.01.1.C,"**What it is.** Fully bespoke CDC: parse DB logs or change tables and apply changes to Snowflake with custom code.
+**Why choose it.** Only when SaaS/Open‑source cannot meet unique constraints (legacy DBs, bespoke rules).
+**Trade‑offs.** Highest complexity and maintenance responsibility; build full reliability yourself.
+",High,MVP:❌ Prod:⚙️ Ent:✅,Viable,blueprint;option;F.01,Create or Update
+F.01.1.C – Custom CDC via Log Shipping,Tasks – F.01.1.C,Tasks,F.01.1.C,Tasks filtered by OptionRef=F.01.1.C.,,,,blueprint;tasks;F.01,Create or Update

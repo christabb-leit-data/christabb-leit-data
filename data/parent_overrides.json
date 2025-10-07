@@ -1,23 +1,11 @@
 {
-  "F.07 \u2013 AI/ML": {
-    "id": "2690545483855"
+  "LEIT Data Platform Blueprint": {
+    "id": "2690544828417"
   },
-  "F.08 \u2013 Visualisation": {
-    "id": "2690545516570"
+  "F.01 \u2013 Ingest": {
+    "id": "2690545483781"
   },
-  "F.09 \u2013 Observability": {
-    "id": "2690545451039"
-  },
-  "F.10 \u2013 Operations": {
-    "id": "2690545451055"
-  },
-  "F.11 \u2013 Meta data Config": {
-    "id": "2690545451066"
-  },
-  "F.12 \u2013 Data Management": {
-    "id": "2690545451086"
-  },
-  "F.13 \u2013 Context Layer": {
-    "id": "2690545483894"
+  "F.01.1 \u2013 CDC Ingestion": {
+    "id": "2690560000095"
   }
 }
