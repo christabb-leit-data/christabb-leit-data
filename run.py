@@ -8,12 +8,16 @@ REQ_PLAN_COLS = ["Parent Page","Page Title","Page Type","Code / Ref","Descriptio
 def esc(s): return html.escape(str(s) if s is not None else "")
 
 def render_tasks_table(tasks_df: pd.DataFrame, option_ref: str) -> str:
-    cols = ["Task ID","Task Title","Task Description","Complexity","MVP","Production","Enterprise","Primary Role","Notes"]
+    preferred = ["Task ID","Task Title","Task Description","Complexity","Primary Role","Notes"]
     df = tasks_df[tasks_df["OptionRef"] == option_ref].copy()
     if df.empty:
         return f"<p><em>No tasks found for OptionRef {esc(option_ref)}.</em></p>"
-    for c in cols:
-        if c not in df.columns: df[c] = ""
+    # Derive columns dynamically from what's actually in the CSV
+    cols = [c for c in preferred if c in df.columns] or preferred
+    # Backfill any missing preferred columns
+    for c in preferred:
+        if c not in df.columns:
+            df[c] = ""
     th = "".join(f"<th>{esc(c)}</th>" for c in cols)
     trs = []
     for _, r in df.iterrows():
