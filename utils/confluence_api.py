@@ -96,18 +96,12 @@ class ConfluenceAPI:
         r.raise_for_status()
         current_version = r.json()['version']['number']
         
+        url = self._url(f"/rest/api/content/{page_id}")
         payload = {
-            "id": page_id,
-            "type": "page",
-            "title": title,
+            "id": page_id, "type": "page", "title": title,
             "version": {"number": current_version + 1},
-            "body": {
-                "atlas_doc_format": {
-                    "value": json.dumps(adf_doc),
-                    "representation": "atlas_doc_format"
-                }
-            }
+            "body": {"atlas_doc_format": {"value": json.dumps(adf_doc), "representation":"atlas_doc_format"}}
         }
-        resp = self.session.put(self._url(f"/rest/api/content/{page_id}"), json=payload)
-        resp.raise_for_status()
-        return resp.json()
+        r = self.session.put(url, json=payload)
+        r.raise_for_status()
+        return r.json()

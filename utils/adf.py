@@ -1,66 +1,59 @@
-def adf_text(s: str):
-    return {"type": "text", "text": s}
+def adf_text(s: str): 
+    return {"type":"text","text": s}
 
-def adf_p(*texts: str):
-    return {"type": "paragraph", "content": [adf_text(t) for t in texts if t]}
+def adf_p(s: str):    
+    return {"type":"paragraph","content":[adf_text(s)]}
 
-def adf_cell(*texts: str):
-    return {"type": "tableCell", "attrs": {"colspan": 1, "rowspan": 1}, "content": [adf_p(*texts)]}
-
-def adf_header(text: str):
-    return {"type": "tableHeader", "attrs": {"colspan": 1, "rowspan": 1}, "content": [adf_p(text)]}
-
-def _trim_text(text: str, max_length: int = 100) -> str:
-    """Trim ultra-long text to reasonable length for better readability."""
-    if not text or len(text) <= max_length:
-        return text
-    return text[:max_length-3] + "..."
-
-def build_tasks_table_adf(rows, compact=True):
-    """
-    rows: iterable of dicts with keys:
-      ID, Title, Desc, CX, Role, Dep, Client Deps, Deliverables, Acceptance
-    Returns ADF node for a compact, full-width table with trimmed text.
-    """
-    headers = ["ID","Title","Desc","CX","Role","Dep","Client Deps","Deliverables","Acceptance"]
-    colwidth = [80,170,360,40,70,110,140,140,160]
-
-    table = {
-        "type": "table",
-        "attrs": {"isNumberColumnEnabled": False, "layout": "full-width", "colwidth": colwidth},
-        "content": []
+def adf_th(text: str, width_px: int):
+    # width hint must live on the HEADER cell
+    return {
+        "type":"tableHeader",
+        "attrs":{"colspan":1,"rowspan":1,"colwidth":[int(width_px)]},
+        "content":[adf_p(text)]
     }
-    # header row
+
+def adf_td(text: str):
+    return {"type":"tableCell","attrs":{"colspan":1,"rowspan":1},"content":[adf_p(text)]}
+
+def build_tasks_table_adf(rows: list[dict]) -> dict:
+    # Tune these numbers as you like — they are pixel hints
+    # Confluence Cloud resizes columns based on header cell colwidth
+    # If any column still squeezes, bump its header width px (e.g., Desc 460→520)
+    headers = [
+        ("ID",80), ("Title",190), ("Desc",520), ("CX",48),  # Increased Desc width for better readability
+        ("Role",78), ("Dep",120), ("Client Deps",180), ("Deliverables",160), ("Acceptance",160),
+    ]
+    table = {"type":"table","attrs":{"isNumberColumnEnabled":False,"layout":"wide"},"content":[]}
+    # header row with colwidth
     table["content"].append({
-        "type": "tableRow",
-        "content": [adf_header(h) for h in headers]
+        "type":"tableRow",
+        "content":[adf_th(h, w) for (h, w) in headers]
     })
     # data rows
     for r in rows:
         table["content"].append({
-            "type": "tableRow",
-            "content": [
-                adf_cell(r.get("ID","")),
-                adf_cell(_trim_text(r.get("Title",""), 80)),  # Trim long titles
-                adf_cell(_trim_text(r.get("Desc",""), 150)),  # Trim long descriptions
-                adf_cell(r.get("CX","")),              # Expect L/M/H
-                adf_cell(r.get("Role","")),            # DE/SDE/SDA/PDA
-                adf_cell(r.get("Dep","")),
-                adf_cell(_trim_text(r.get("Client Deps",""), 80)),  # Trim client deps
-                adf_cell(_trim_text(r.get("Deliverables",""), 100)),  # Keep deliverables concise
-                adf_cell(_trim_text(r.get("Acceptance",""), 100)),  # Keep acceptance concise
+            "type":"tableRow",
+            "content":[
+                adf_td(r.get("ID","")), adf_td(r.get("Title","")), adf_td(r.get("Desc","")),
+                adf_td(r.get("CX","")), adf_td(r.get("Role","")), adf_td(r.get("Dep","")),
+                adf_td(r.get("Client Deps","")), adf_td(r.get("Deliverables","")), adf_td(r.get("Acceptance","")),
             ]
         })
     return table
 
-def build_tasks_page_doc(option_ref: str, rows: list[dict]):
-    table = build_tasks_table_adf(rows, compact=True)
+def build_tasks_page_doc(option_ref: str, rows: list[dict]) -> dict:
+    """
+    Build ADF document for tasks page.
+    
+    Note: After publishing, flip the page to Full width once in Confluence UI 
+    (page toolbar → Page width). That affects the canvas, while layout:"wide" 
+    affects the table element itself.
+    """
     return {
         "version": 1,
         "type": "doc",
         "content": [
-            {"type":"paragraph","content":[adf_text(f"Tasks filtered by OptionRef={option_ref}.")]},
-            {"type":"paragraph","content":[adf_text("Legend: CX=L/M/H; Role=DE/SDE/SDA/PDA; Dep=Task IDs")]},
-            table
+            {"type":"paragraph","content":[adf_text(f"Legend: CX=L/M/H; Role=DE/SDE/SDA/PDA; Dep=Task IDs")]},
+            build_tasks_table_adf(rows)
         ]
     }

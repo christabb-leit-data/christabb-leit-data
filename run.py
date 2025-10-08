@@ -7,20 +7,14 @@ from typing import Dict, List, Any
 
 REQ_PLAN_COLS = ["Parent Page","Page Title","Page Type","Code / Ref","Description / Notes","Complexity","Mode Applicability","Validation / Cleanup Flag","Labels","Recommended Action"]
 
-HEADER_ALIASES = {
-    "Task ID": "ID",
-    "Task Title": "Title", 
-    "Task Description": "Desc",
-    "Primary Role": "Role",
-    "Client Dependencies": "Client Deps",
-    "Acceptance Criteria": "Acceptance",
-    "Predecessors": "Dep",
+HEADER_MAP = {
+    "Task ID":"ID","Task Title":"Title","Task Description":"Desc","Complexity":"CX",
+    "Primary Role":"Role","Predecessors":"Dep","Client Dependencies":"Client Deps",
+    "Deliverables":"Deliverables","Acceptance Criteria":"Acceptance",
+    "ID":"ID","Title":"Title","Desc":"Desc","CX":"CX","Role":"Role","Dep":"Dep",
+    "Client Deps":"Client Deps","Acceptance":"Acceptance",
 }
-DROP_COLS = {
-    "Orchestration Integration",
-    "Monitoring & Alerting",
-    "Schedule / Frequency",
-}
+DROP_COLS = {"Orchestration Integration","Monitoring & Alerting","Schedule / Frequency"}
 WIDTHS = {  # % hints (Confluence honors <colgroup> in storage XHTML)
     "Task ID": 8, "Task Title": 18, "Task Description": 34,
     "Primary Role": 8, "Complexity": 6, "Predecessors": 8,
@@ -38,6 +32,25 @@ def _complexity_code(val: str) -> str:
         "medium": "M", "m": "M",
         "high": "H", "h": "H",
     }.get(m, (val or "").strip())
+
+def _cx_code(v: str) -> str:
+    """Normalize complexity to codes: L, M, H (fallback to original)."""
+    m = (v or "").strip().lower()
+    return {"low":"L","l":"L","medium":"M","m":"M","high":"H","h":"H"}.get(m, (v or "").strip())
+
+def normalize_tasks_df(df: pd.DataFrame, option_ref: str) -> list[dict]:
+    """Normalize tasks DataFrame to standardized format for ADF table."""
+    x = df[df.get("OptionRef","").astype(str).str.strip() == option_ref].copy()
+    if x.empty: return []
+    x = x.drop(columns=[c for c in DROP_COLS if c in x.columns], errors="ignore").fillna("")
+    rows = []
+    for _, s in x.iterrows():
+        r = {k:"" for k in ["ID","Title","Desc","CX","Role","Dep","Client Deps","Deliverables","Acceptance"]}
+        for src, tgt in HEADER_MAP.items():
+            if src in s.index: r[tgt] = str(s[src]).strip()
+        r["CX"] = _cx_code(r["CX"])
+        rows.append(r)
+    return rows
 
 def render_tasks_table_adf(tasks_df: pd.DataFrame, option_ref: str) -> Dict[str, Any]:
     """Generate ADF format for tasks table using clean utility functions."""
@@ -220,33 +233,8 @@ def build_body(row, tasks_df: pd.DataFrame = None, use_prosemirror: bool = False
         if use_prosemirror:
             # ADF/ProseMirror JSON format
             if tasks_df is not None and not tasks_df.empty:
-                # Convert DataFrame to the format expected by build_tasks_page_doc
-                rows = []
-                for _, r in tasks_df.iterrows():
-                    row_dict = {}
-                    for c in tasks_df.columns:
-                        v = r[c]
-                        if c == "Complexity":
-                            code_val = _complexity_code(v)
-                            row_dict["CX"] = code_val
-                        elif c == "Task ID":
-                            row_dict["ID"] = str(v or "")
-                        elif c == "Task Title":
-                            row_dict["Title"] = str(v or "")
-                        elif c == "Task Description":
-                            row_dict["Desc"] = str(v or "")
-                        elif c == "Primary Role":
-                            row_dict["Role"] = str(v or "")
-                        elif c == "Predecessors":
-                            row_dict["Dep"] = str(v or "")
-                        elif c == "Client Dependencies":
-                            row_dict["Client Deps"] = str(v or "")
-                        elif c == "Deliverables":
-                            row_dict["Deliverables"] = str(v or "")
-                        elif c == "Acceptance Criteria":
-                            row_dict["Acceptance"] = str(v or "")
-                    rows.append(row_dict)
-                
+                # Use the new normalization function for clean data processing
+                rows = normalize_tasks_df(tasks_df, code)
                 body = build_tasks_page_doc(code, rows)
             else:
                 # Fallback placeholder for ADF
