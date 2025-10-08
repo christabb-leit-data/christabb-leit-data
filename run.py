@@ -5,7 +5,33 @@ from utils.confluence_api import ConfluenceAPI
 
 REQ_PLAN_COLS = ["Parent Page","Page Title","Page Type","Code / Ref","Description / Notes","Complexity","Mode Applicability","Validation / Cleanup Flag","Labels","Recommended Action"]
 
-DROP_COLS = {"Orchestration Integration", "Monitoring & Alerting", "Schedule / Frequency"}
+HEADER_ALIASES = {
+    "Task ID": "ID",
+    "Task Title": "Title",
+    "Task Description": "Description",
+    "Primary Role": "Role",
+    "Client Dependencies": "Client Deps",
+    "Acceptance Criteria": "Acceptance",
+    "Predecessors": "Pre-reqs",
+}
+
+DROP_COLS = {
+    "Orchestration Integration",
+    "Monitoring & Alerting",
+    "Schedule / Frequency",
+}
+
+WIDTHS = {  # percentage hints; Confluence will respect colgroup without inline CSS
+    "Task ID": 8,
+    "Task Title": 18,
+    "Task Description": 34,
+    "Primary Role": 8,
+    "Complexity": 6,
+    "Predecessors": 8,
+    "Client Dependencies": 10,
+    "Deliverables": 8,
+    "Acceptance Criteria": 10,
+}
 
 def _esc(s) -> str:
     return html.escape("" if s is None else str(s))
@@ -21,6 +47,35 @@ def _complexity_code(val: str) -> str:
 
 def esc(s): return _esc(s)
 
+def _as_storage_html(value: str) -> str:
+    """
+    Accepts plain text, markdown-ish, or HTML.
+    If it *looks* like HTML (starts with '<'), pass through.
+    Otherwise, wrap lines in <p> and bullets into <ul>/<li> so it renders nicely.
+    Returns XHTML suitable for Confluence 'storage' representation.
+    """
+    txt = (value or "").strip()
+    if txt.startswith("<"):  # treat as HTML already
+        return txt
+    # very small markdown-to-HTML for bullets/headings
+    lines = [l.rstrip() for l in txt.splitlines() if l.strip() != ""]
+    out = []
+    in_ul = False
+    for line in lines:
+        if line.lstrip().startswith(("-", "*")):
+            if not in_ul:
+                out.append("<ul>")
+                in_ul = True
+            out.append(f"<li>{html.escape(line.lstrip('-* ').strip())}</li>")
+        else:
+            if in_ul:
+                out.append("</ul>")
+                in_ul = False
+            out.append(f"<p>{html.escape(line)}</p>")
+    if in_ul:
+        out.append("</ul>")
+    return "".join(out)
+
 def render_tasks_table(tasks_df: pd.DataFrame, option_ref: str) -> str:
     df = tasks_df[tasks_df.get("OptionRef") == option_ref].copy()
     if df.empty:
@@ -29,19 +84,26 @@ def render_tasks_table(tasks_df: pd.DataFrame, option_ref: str) -> str:
     preferred = [
         "Task ID","Task Title","Task Description","Complexity","Primary Role","Notes",
         "Predecessors","Client Dependencies","Deliverables","Acceptance Criteria",
-        # legacy optional:
-        "Orchestration Integration","Monitoring & Alerting","Schedule / Frequency",
+        # legacy/optional columns (kept only if present and not in DROP_COLS)
         "MVP","Production","Enterprise",
     ]
-    cols = [c for c in preferred if c in df.columns]
-    df = df[cols].copy()
+    cols = [c for c in preferred if c in df.columns and c not in DROP_COLS]
+    df = df[cols].replace({pd.NA: "", None: ""}).fillna("")
 
-    # Clean up values and drop unwanted columns defensively (even if a future CSV reintroduces them)
-    df = df.replace({pd.NA: "", None: ""}).fillna("")
-    df = df[[c for c in df.columns if c not in DROP_COLS]]
+    # Build colgroup with width hints for present columns
+    colgroup = "<colgroup>" + "".join(
+        f'<col width="{WIDTHS.get(c, 8)}%"/>'
+        for c in df.columns
+    ) + "</colgroup>"
 
-    thead = "".join(f'<th style="padding:4px 6px;">{_esc(c)}</th>' for c in df.columns)
-    rows = []
+    # Header row with short labels
+    thead = "".join(
+        f"<th>{_esc(HEADER_ALIASES.get(c, c))}</th>"
+        for c in df.columns
+    )
+
+    # Body
+    trs = []
     for _, r in df.iterrows():
         tds = []
         for c in df.columns:
@@ -49,23 +111,23 @@ def render_tasks_table(tasks_df: pd.DataFrame, option_ref: str) -> str:
             if c == "Complexity":
                 code = _complexity_code(v)
                 long = {"L":"Low","M":"Medium","H":"High"}.get(code, str(v or ""))
-                cell = f'<abbr title="{_esc(long)}">{_esc(code)}</abbr>'
+                tds.append(f'<td><span title="{_esc(long)}">{_esc(code)}</span></td>')
             else:
-                cell = _esc(v)
-            tds.append(f'<td style="padding:4px 6px; vertical-align:top; word-break:break-word; white-space:normal;">{cell}</td>')
-        rows.append("<tr>" + "".join(tds) + "</tr>")
+                tds.append(f"<td>{_esc(v)}</td>")
+        trs.append("<tr>" + "".join(tds) + "</tr>")
 
-    # Small font wrapper so it fits the page
+    # No inline styles; pure storage HTML
     return (
-        '<small><div class="leit-tasks" style="font-size:12px; line-height:1.35;">'
-        '<table style="border-collapse:collapse; table-layout:fixed; width:100%;">'
-        f"<thead><tr>{thead}</tr></thead><tbody>{''.join(rows)}</tbody></table>"
-        "</div></small>"
+        "<table>"
+        f"{colgroup}"
+        f"<thead><tr>{thead}</tr></thead>"
+        f"<tbody>{''.join(trs)}</tbody>"
+        "</table>"
     )
 
 def build_body(row, tasks_df: pd.DataFrame = None):
     page_type = row.get("Page Type","")
-    desc = row.get("Description / Notes","")
+    desc = _as_storage_html(row.get("Description / Notes",""))
     complexity = row.get("Complexity","")
     modes = row.get("Mode Applicability","")
     flag = row.get("Validation / Cleanup Flag","")
@@ -74,7 +136,7 @@ def build_body(row, tasks_df: pd.DataFrame = None):
     if page_type == "Subcomponent":
         body = f"""
 <h2>Overview</h2>
-<p>{esc(desc)}</p>
+{desc}
 <h3>Options</h3>
 <p>Child pages list the implementation options for this subcomponent.</p>
 """
@@ -85,7 +147,7 @@ def build_body(row, tasks_df: pd.DataFrame = None):
         body = f"""
 <h2>Option Overview</h2>
 <div style="margin-bottom: 15px;">
-  <p style="font-size: 12px; line-height: 1.4; margin-bottom: 10px;">{esc(desc)}</p>
+  <div style="font-size: 12px; line-height: 1.4; margin-bottom: 10px;">{desc}</div>
 </div>
 
 <table class="confluenceTable" style="width: 100%; margin-bottom: 15px; font-size: 11px;">
