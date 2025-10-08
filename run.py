@@ -9,7 +9,9 @@ def esc(s): return html.escape(str(s) if s is not None else "")
 
 def render_tasks_table(tasks_df: pd.DataFrame, option_ref: str) -> str:
     preferred = ["Task ID","Task Title","Task Description","Complexity","Primary Role","Notes"]
-    df = tasks_df[tasks_df["OptionRef"] == option_ref].copy()
+    # Handle both "OptionRef" and "Option Ref" column names
+    option_col = "OptionRef" if "OptionRef" in tasks_df.columns else "Option Ref"
+    df = tasks_df[tasks_df[option_col] == option_ref].copy()
     if df.empty:
         return f"<p><em>No tasks found for OptionRef {esc(option_ref)}.</em></p>"
     # Derive columns dynamically from what's actually in the CSV
