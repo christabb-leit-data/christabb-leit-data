@@ -2,6 +2,8 @@ import os, json, argparse, html
 import pandas as pd
 from dotenv import load_dotenv
 from utils.confluence_api import ConfluenceAPI
+from utils.adf import build_tasks_table_adf, build_tasks_page_doc, adf_p, adf_text
+from typing import Dict, List, Any
 
 REQ_PLAN_COLS = ["Parent Page","Page Title","Page Type","Code / Ref","Description / Notes","Complexity","Mode Applicability","Validation / Cleanup Flag","Labels","Recommended Action"]
 
@@ -14,23 +16,15 @@ HEADER_ALIASES = {
     "Acceptance Criteria": "Acceptance",
     "Predecessors": "Pre-reqs",
 }
-
 DROP_COLS = {
     "Orchestration Integration",
     "Monitoring & Alerting",
     "Schedule / Frequency",
 }
-
-WIDTHS = {  # percentage hints; Confluence will respect colgroup without inline CSS
-    "Task ID": 8,
-    "Task Title": 18,
-    "Task Description": 34,
-    "Primary Role": 8,
-    "Complexity": 6,
-    "Predecessors": 8,
-    "Client Dependencies": 10,
-    "Deliverables": 8,
-    "Acceptance Criteria": 10,
+WIDTHS = {  # % hints (Confluence honors <colgroup> in storage XHTML)
+    "Task ID": 8, "Task Title": 18, "Task Description": 34,
+    "Primary Role": 8, "Complexity": 6, "Predecessors": 8,
+    "Client Dependencies": 10, "Deliverables": 8, "Acceptance Criteria": 10,
 }
 
 def _esc(s) -> str:
@@ -44,6 +38,49 @@ def _complexity_code(val: str) -> str:
         "medium": "M", "m": "M",
         "high": "H", "h": "H",
     }.get(m, (val or "").strip())
+
+def render_tasks_table_adf(tasks_df: pd.DataFrame, option_ref: str) -> Dict[str, Any]:
+    """Generate ADF format for tasks table using clean utility functions."""
+    df = tasks_df[tasks_df.get("OptionRef") == option_ref].copy()
+    if df.empty:
+        return adf_p(f"No tasks found for OptionRef {option_ref}.")
+
+    preferred = [
+        "Task ID","Task Title","Task Description","Complexity","Primary Role","Notes",
+        "Predecessors","Client Dependencies","Deliverables","Acceptance Criteria",
+        "MVP","Production","Enterprise",  # only kept if present
+    ]
+    cols = [c for c in preferred if c in df.columns and c not in DROP_COLS]
+    df = df[cols].replace({pd.NA: "", None: ""}).fillna("")
+
+    # Convert DataFrame rows to the format expected by build_tasks_table_adf
+    rows = []
+    for _, r in df.iterrows():
+        row_dict = {}
+        for c in df.columns:
+            v = r[c]
+            if c == "Complexity":
+                code = _complexity_code(v)
+                row_dict["CX"] = code  # Use short alias
+            elif c == "Task ID":
+                row_dict["ID"] = str(v or "")
+            elif c == "Task Title":
+                row_dict["Title"] = str(v or "")
+            elif c == "Task Description":
+                row_dict["Desc"] = str(v or "")
+            elif c == "Primary Role":
+                row_dict["Role"] = str(v or "")
+            elif c == "Predecessors":
+                row_dict["Dep"] = str(v or "")
+            elif c == "Client Dependencies":
+                row_dict["Client Deps"] = str(v or "")
+            elif c == "Deliverables":
+                row_dict["Deliverables"] = str(v or "")
+            elif c == "Acceptance Criteria":
+                row_dict["Acceptance"] = str(v or "")
+        rows.append(row_dict)
+
+    return build_tasks_table_adf(rows)
 
 def esc(s): return _esc(s)
 
@@ -84,26 +121,23 @@ def render_tasks_table(tasks_df: pd.DataFrame, option_ref: str) -> str:
     preferred = [
         "Task ID","Task Title","Task Description","Complexity","Primary Role","Notes",
         "Predecessors","Client Dependencies","Deliverables","Acceptance Criteria",
-        # legacy/optional columns (kept only if present and not in DROP_COLS)
-        "MVP","Production","Enterprise",
+        "MVP","Production","Enterprise",  # only kept if present
     ]
     cols = [c for c in preferred if c in df.columns and c not in DROP_COLS]
     df = df[cols].replace({pd.NA: "", None: ""}).fillna("")
 
-    # Build colgroup with width hints for present columns
+    # Width hints (no inline CSS)
     colgroup = "<colgroup>" + "".join(
         f'<col width="{WIDTHS.get(c, 8)}%"/>'
         for c in df.columns
     ) + "</colgroup>"
 
-    # Header row with short labels
     thead = "".join(
         f"<th>{_esc(HEADER_ALIASES.get(c, c))}</th>"
         for c in df.columns
     )
 
-    # Body
-    trs = []
+    body_rows = []
     for _, r in df.iterrows():
         tds = []
         for c in df.columns:
@@ -114,18 +148,18 @@ def render_tasks_table(tasks_df: pd.DataFrame, option_ref: str) -> str:
                 tds.append(f'<td><span title="{_esc(long)}">{_esc(code)}</span></td>')
             else:
                 tds.append(f"<td>{_esc(v)}</td>")
-        trs.append("<tr>" + "".join(tds) + "</tr>")
+        body_rows.append("<tr>" + "".join(tds) + "</tr>")
 
-    # No inline styles; pure storage HTML
+    # <small> shrinks font universally (works even if styles are stripped)
     return (
-        "<table>"
+        "<small><table>"
         f"{colgroup}"
         f"<thead><tr>{thead}</tr></thead>"
-        f"<tbody>{''.join(trs)}</tbody>"
-        "</table>"
+        f"<tbody>{''.join(body_rows)}</tbody>"
+        "</table></small>"
     )
 
-def build_body(row, tasks_df: pd.DataFrame = None):
+def build_body(row, tasks_df: pd.DataFrame = None, use_prosemirror: bool = False):
     page_type = row.get("Page Type","")
     desc = _as_storage_html(row.get("Description / Notes",""))
     complexity = row.get("Complexity","")
@@ -182,21 +216,58 @@ def build_body(row, tasks_df: pd.DataFrame = None):
 </div>
 """
     else:
-        if tasks_df is not None and not tasks_df.empty:
-            tasks_html = render_tasks_table(tasks_df, code)
-            body = f"""
-<h2>Tasks for {esc(code)}</h2>
-<div style="margin-bottom: 15px;">
-  <p style="font-size: 12px; line-height: 1.4; margin-bottom: 10px;">{esc(desc)}</p>
-</div>
-{tasks_html}
-"""
+        # Tasks page with intro and tasks table
+        if use_prosemirror:
+            # ADF/ProseMirror JSON format
+            if tasks_df is not None and not tasks_df.empty:
+                # Convert DataFrame to the format expected by build_tasks_page_doc
+                rows = []
+                for _, r in tasks_df.iterrows():
+                    row_dict = {}
+                    for c in tasks_df.columns:
+                        v = r[c]
+                        if c == "Complexity":
+                            code_val = _complexity_code(v)
+                            row_dict["CX"] = code_val
+                        elif c == "Task ID":
+                            row_dict["ID"] = str(v or "")
+                        elif c == "Task Title":
+                            row_dict["Title"] = str(v or "")
+                        elif c == "Task Description":
+                            row_dict["Desc"] = str(v or "")
+                        elif c == "Primary Role":
+                            row_dict["Role"] = str(v or "")
+                        elif c == "Predecessors":
+                            row_dict["Dep"] = str(v or "")
+                        elif c == "Client Dependencies":
+                            row_dict["Client Deps"] = str(v or "")
+                        elif c == "Deliverables":
+                            row_dict["Deliverables"] = str(v or "")
+                        elif c == "Acceptance Criteria":
+                            row_dict["Acceptance"] = str(v or "")
+                    rows.append(row_dict)
+                
+                body = build_tasks_page_doc(code, rows)
+            else:
+                # Fallback placeholder for ADF
+                body = {
+                    "version": 1,
+                    "type": "doc",
+                    "content": [
+                        adf_p(f"Tasks – {code}"),
+                        adf_p(f"Populate from 'Blueprint_Tasks_Mapped_To_OptionRefs.csv' filtered by OptionRef = {code}.")
+                    ]
+                }
         else:
-            body = f"""
-<h2>Tasks for {esc(code)}</h2>
-<div style="margin-bottom: 15px;">
-  <p style="font-size: 12px; line-height: 1.4; margin-bottom: 10px;">{esc(desc)}</p>
-</div>
+            # HTML storage format
+            intro_html = f"<p><strong>Tasks – {esc(code)}</strong></p>"
+            
+            if tasks_df is not None and not tasks_df.empty:
+                tasks_html = render_tasks_table(tasks_df, code)
+                body = intro_html + tasks_html  # DO NOT html.escape() this
+            else:
+                # Fallback placeholder table
+                placeholder_html = f"""
 <table class="confluenceTable" style="width: 100%; font-size: 11px;">
   <thead>
     <tr>
@@ -217,6 +288,7 @@ def build_body(row, tasks_df: pd.DataFrame = None):
   </tbody>
 </table>
 """
+                body = intro_html + placeholder_html  # DO NOT html.escape() this
     return body
 
 def main():
@@ -232,6 +304,7 @@ def main():
     p.add_argument("--only-types", default="", help="Comma list: Subcomponent,Option,Tasks")
     p.add_argument("--limit", type=int, default=0)
     p.add_argument("--inject_tasks", action="store_true", help="Inject tasks table into Tasks pages from CSV")
+    p.add_argument("--prosemirror", action="store_true", help="Use ProseMirror JSON format instead of HTML storage")
     args = p.parse_args()
 
     api = ConfluenceAPI(
@@ -271,14 +344,19 @@ def main():
         if not title: continue
 
         existing = api.find_page_by_title(title) or api.find_page_relaxed(title)
-        body_html = build_body(row, tasks_df if args.inject_tasks else pd.DataFrame())
+        body_content = build_body(row, tasks_df if args.inject_tasks else pd.DataFrame(), args.prosemirror)
 
         if existing:
             if args.update:
                 if args.dry_run:
                     print(f"[DRY][UPDATE] {title}")
                 else:
-                    api.update_page_body(existing["id"], title, body_html)
+                    if args.prosemirror and isinstance(body_content, dict):
+                        # ADF format - use proper ADF update method
+                        api.update_page_adf(existing["id"], title, body_content)
+                    else:
+                        # HTML storage format
+                        api.update_page_body(existing["id"], title, body_content)
                     if labels: api.set_labels(existing["id"], labels)
                 updated += 1
             else:
@@ -289,7 +367,15 @@ def main():
         if args.dry_run:
             print(f"[DRY][CREATE] '{title}' under '{parent_title}' (parent_id={parent_id})")
             continue
-        api.create_page(title, body_html, parent_id=parent_id, labels=labels)
+        
+        if args.prosemirror and isinstance(body_content, dict):
+            # ADF format - need to create page with ADF body
+            # For now, convert to JSON string (create_page doesn't support ADF directly)
+            body_html = json.dumps(body_content)
+            api.create_page(title, body_html, parent_id=parent_id, labels=labels)
+        else:
+            # HTML storage format
+            api.create_page(title, body_content, parent_id=parent_id, labels=labels)
         created += 1
 
     print(f"Done. Created={created} Updated={updated} Skipped={skipped}")

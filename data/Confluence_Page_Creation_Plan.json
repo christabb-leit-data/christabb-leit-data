@@ -1,26 +1,38 @@
 [
   {
+    "Parent Page": "F.01 – Ingest",
+    "Page Title": "F.01.1 – CDC Ingestion",
+    "Page Type": "Subcomponent",
+    "Code / Ref": "F.01.1",
+    "Description / Notes": "<p><strong>Purpose</strong><br/>\nKeep downstream models up to date by continuously replicating source changes (inserts, updates, deletes) into Snowflake with low latency.</p>\n<p><strong>When to use</strong></p>\n<ul>\n<li>Operational sources expose change logs (WAL/binlog/redo) or change tables.</li>\n<li>You need near‑real‑time freshness for analytics, CDC‑based microservices, or event‑driven transformations.</li>\n<li>Complements <em>F.01.4 Batch</em> (bulk, lower frequency) and <em>F.01.5 Streaming</em> (event streams).</li>\n</ul>\n<p><strong>Options</strong></p>\n<ul>\n<li><strong>F.01.1.A – SaaS CDC Connector</strong> — Managed service; fastest time‑to‑value.</li>\n<li><strong>F.01.1.B – OpenFlow (Native CDC via Log)</strong> — Native log‑based CDC pipeline using OpenFlow.</li>\n<li><strong>F.01.1.C – Custom CDC via Log Shipping</strong> — Bespoke CDC for niche/legacy sources; highest engineering overhead.</li>\n</ul>",
+    "Complexity": "",
+    "Mode Applicability": "",
+    "Validation / Cleanup Flag": "Viable",
+    "Labels": "blueprint;subcomponent;F.01",
+    "Recommended Action": "Update"
+  },
+  {
     "Parent Page": "F.01.1 – CDC Ingestion",
     "Page Title": "F.01.1.A – SaaS CDC Connector",
     "Page Type": "Option",
     "Code / Ref": "F.01.1.A",
-    "Description / Notes": "**What it is.** A managed CDC service (e.g., Fivetran/Hevo/Hightouch) that extracts changes from source systems and lands them in Snowflake with schema‑drift handling, soft‑deletes, and scheduling controls.\n**When to use.** Fastest path to CDC with minimal engineering overhead; works well for MVP and production scenarios with vendor monitoring.\n**Trade‑offs.** Ongoing licensing/usage costs and less flexibility for niche sources or heavy customization.",
-    "Complexity": "Medium",
+    "Description / Notes": "<p><strong>What it is</strong><br/>\nA managed CDC service (e.g., Fivetran/Hevo/Hightouch) that extracts changes from source systems and lands them in Snowflake. Vendors handle schema drift, soft‑deletes, retries, and scheduling.</p>\n<p><strong>Fit &amp; trade‑offs</strong></p>\n<ul>\n<li><strong>Pros:</strong> Fast start (Partner Connect), low ops overhead, broad connectors, built‑in monitoring.</li>\n<li><strong>Cons:</strong> Ongoing licensing/usage cost; less flexibility for niche/custom patterns.</li>\n</ul>\n<p><strong>Typical architecture</strong><br/>\nSource DB → SaaS CDC connector → Cloud stage/queue → Snowflake (landing) → Transformations (e.g., dbt).</p>\n<p><strong>Prerequisites</strong></p>\n<ul>\n<li>Security decision: private networking (PrivateLink/Private Link/PSC) vs allow‑list.</li>\n<li>Destination RBAC (least‑privilege) and dedicated ingestion warehouse.</li>\n<li>Source table inventory with PKs; FK graph captured from source catalogs for parent‑first DAGs.</li>\n</ul>\n<p><strong>Where to go next</strong><br/>\nSee the <em>Tasks – F.01.1.A</em> page for the full delivery plan, dependencies, and handover criteria.</p>",
+    "Complexity": "M",
     "Mode Applicability": "",
     "Validation / Cleanup Flag": "Viable",
     "Labels": "blueprint;option;F.01",
-    "Recommended Action": "Create or Update"
+    "Recommended Action": "Update"
   },
   {
     "Parent Page": "F.01.1.A – SaaS CDC Connector",
     "Page Title": "Tasks – F.01.1.A",
     "Page Type": "Tasks",
     "Code / Ref": "F.01.1.A",
-    "Description / Notes": "Option Overview: **What it is.** A managed CDC service (e.g., Fivetran/Hevo/Hightouch) that extracts changes from source systems and lands them in Snowflake with schema‑drift handling, soft‑deletes, and scheduling controls. **When to use.** Fastest path to CDC with minimal engineering overhead; works well for MVP and production scenarios with vendor monitoring. **Trade‑offs.** Ongoing licensing/usage costs and less flexibility for niche sources or heavy customization.",
+    "Description / Notes": "Option Overview: SaaS connector for log‑based CDC to Snowflake. See Option page for details.",
     "Complexity": "",
     "Mode Applicability": "",
     "Validation / Cleanup Flag": "",
     "Labels": "blueprint;tasks;F.01",
-    "Recommended Action": "Create or Update"
+    "Recommended Action": "Update"
   }
 ]

@@ -1,4 +1,4 @@
-import requests, urllib.parse
+import requests, urllib.parse, json
 from typing import Optional, Dict, Any, List
 
 class ConfluenceAPI:
@@ -88,3 +88,26 @@ class ConfluenceAPI:
             resp.raise_for_status()
         except Exception:
             pass
+
+    def update_page_adf(self, page_id: str, title: str, adf_doc: dict):
+        """Update page with ADF format using atlas_doc_format representation."""
+        # Get current version
+        r = self.session.get(self._url(f"/rest/api/content/{page_id}?expand=version"))
+        r.raise_for_status()
+        current_version = r.json()['version']['number']
+        
+        payload = {
+            "id": page_id,
+            "type": "page",
+            "title": title,
+            "version": {"number": current_version + 1},
+            "body": {
+                "atlas_doc_format": {
+                    "value": json.dumps(adf_doc),
+                    "representation": "atlas_doc_format"
+                }
+            }
+        }
+        resp = self.session.put(self._url(f"/rest/api/content/{page_id}"), json=payload)
+        resp.raise_for_status()
+        return resp.json()

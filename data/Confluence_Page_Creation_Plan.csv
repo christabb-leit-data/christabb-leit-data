@@ -1,5 +1,31 @@
 Parent Page,Page Title,Page Type,Code / Ref,Description / Notes,Complexity,Mode Applicability,Validation / Cleanup Flag,Labels,Recommended Action
-F.01.1 – CDC Ingestion,F.01.1.A – SaaS CDC Connector,Option,F.01.1.A,"**What it is.** A managed CDC service (e.g., Fivetran/Hevo/Hightouch) that extracts changes from source systems and lands them in Snowflake with schema‑drift handling, soft‑deletes, and scheduling controls.
-**When to use.** Fastest path to CDC with minimal engineering overhead; works well for MVP and production scenarios with vendor monitoring.
-**Trade‑offs.** Ongoing licensing/usage costs and less flexibility for niche sources or heavy customization.",Medium,,Viable,blueprint;option;F.01,Create or Update
-F.01.1.A – SaaS CDC Connector,Tasks – F.01.1.A,Tasks,F.01.1.A,"Option Overview: **What it is.** A managed CDC service (e.g., Fivetran/Hevo/Hightouch) that extracts changes from source systems and lands them in Snowflake with schema‑drift handling, soft‑deletes, and scheduling controls. **When to use.** Fastest path to CDC with minimal engineering overhead; works well for MVP and production scenarios with vendor monitoring. **Trade‑offs.** Ongoing licensing/usage costs and less flexibility for niche sources or heavy customization.",,,,blueprint;tasks;F.01,Create or Update
+F.01 – Ingest,F.01.1 – CDC Ingestion,Subcomponent,F.01.1,"**Purpose**  
+Keep downstream models up to date by continuously replicating source changes (inserts, updates, deletes) into Snowflake with low latency.
+
+**When to use**  
+- Operational sources expose change logs (WAL/binlog/redo) or change tables.  
+- You need near‑real‑time freshness for analytics, CDC‑based microservices, or event‑driven transformations.  
+- Complements **F.01.4 Batch** (bulk, lower frequency) and **F.01.5 Streaming** (event streams).
+
+**Options**  
+- **F.01.1.A – SaaS CDC Connector** — Managed service; fastest time‑to‑value.  
+- **F.01.1.B – OpenFlow (Native CDC via Log)** — Native log‑based CDC pipeline using OpenFlow.  
+- **F.01.1.C – Custom CDC via Log Shipping** — Bespoke CDC for niche/legacy sources; highest engineering overhead.",,,Viable,blueprint;subcomponent;F.01,Update
+F.01.1 – CDC Ingestion,F.01.1.A – SaaS CDC Connector,Option,F.01.1.A,"**What it is**  
+A managed CDC service (e.g., Fivetran/Hevo/Hightouch) that extracts changes from source systems and lands them in Snowflake. Vendors handle schema drift, soft‑deletes, retries, and scheduling.
+
+**Fit & trade‑offs**  
+- **Pros:** Fast start (Partner Connect), low ops overhead, broad connectors, built‑in monitoring.  
+- **Cons:** Ongoing licensing/usage cost; less flexibility for niche/custom patterns.
+
+**Typical architecture**  
+Source DB → SaaS CDC connector → Cloud stage/queue → Snowflake (landing) → Transformations (e.g., dbt).
+
+**Prerequisites**  
+- Security decision: private networking (PrivateLink/Private Link/PSC) vs allow‑list.  
+- Destination RBAC (least‑privilege) and dedicated ingestion warehouse.  
+- Source table inventory with PKs; FK graph captured from source catalogs for parent‑first DAGs.
+
+**Where to go next**  
+- See the **Tasks – F.01.1.A** page for the full delivery plan, dependencies, and handover criteria.",M,,Viable,blueprint;option;F.01,Update
+F.01.1.A – SaaS CDC Connector,Tasks – F.01.1.A,Tasks,F.01.1.A,"Option Overview: **What it is** A managed CDC service (e.g., Fivetran/Hevo/Hightouch) that extracts changes from source systems and lands them in Snowflake. Vendors handle schema drift, soft‑deletes, retries, and scheduling. **Fit & trade‑offs** - **Pros:** Fast start (Partner Connect), low ops overhead, broad connectors, built‑in monitoring. - **Cons:** Ongoing licensing/usage cost; less flexibility for niche/custom patterns. **Typical architecture** Source DB → SaaS CDC connector → Cloud stage/queue → Snowflake (landing) → Transformations (e.g., dbt). **Prerequisites** - Security decision: private networking (PrivateLink/Private Link/PSC) vs allow‑list. - Destination RBAC (least‑privilege) and dedicated ingestion warehouse. - Source table inventory with PKs; FK graph captured from source catalogs for parent‑first DAGs. **Where to go next** - See the **Tasks – F.01.1.A** page for the full delivery plan, dependencies, and handover criteria.",,,,blueprint;tasks;F.01,Update
