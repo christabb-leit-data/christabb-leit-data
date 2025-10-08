@@ -8,29 +8,58 @@ REQ_PLAN_COLS = ["Parent Page","Page Title","Page Type","Code / Ref","Descriptio
 def esc(s): return html.escape(str(s) if s is not None else "")
 
 def render_tasks_table(tasks_df: pd.DataFrame, option_ref: str) -> str:
-    preferred = ["Task ID","Task Title","Task Description","Complexity","Primary Role","Notes"]
     # Handle both "OptionRef" and "Option Ref" column names
     option_col = "OptionRef" if "OptionRef" in tasks_df.columns else "Option Ref"
     df = tasks_df[tasks_df[option_col] == option_ref].copy()
     if df.empty:
         return f"<p><em>No tasks found for OptionRef {esc(option_ref)}.</em></p>"
-    # Derive columns dynamically from what's actually in the CSV
-    cols = [c for c in preferred if c in df.columns] or preferred
-    # Backfill any missing preferred columns
-    for c in preferred:
-        if c not in df.columns:
-            df[c] = ""
-    th = "".join(f"<th>{esc(c)}</th>" for c in cols)
+    
+    # Exclude specific columns and the option reference column
+    exclude_cols = {option_col, "Orchestration Integration", "Monitoring & Alerting", "Schedule / Frequency", "Notes"}
+    cols = [c for c in df.columns if c not in exclude_cols]
+    
+    # Calculate column widths based on content
+    def get_col_width(col_name, col_data):
+        # Base width on column name and content length
+        name_len = len(col_name)
+        max_content_len = max([len(str(val)) for val in col_data if val], default=0)
+        # Use the larger of name length or average content length, with min/max bounds
+        avg_len = max(name_len, max_content_len // max(len(col_data), 1))
+        if col_name in ["Description", "Deliverables", "Acceptance Criteria"]:
+            return "25%"  # Wider for descriptive columns
+        elif col_name in ["Task ID", "Complexity", "Primary Role"]:
+            return "8%"   # Narrower for short columns
+        elif col_name in ["Title", "Predecessors", "Client Dependencies"]:
+            return "15%"  # Medium width
+        else:
+            return "12%"  # Default medium width
+    
+    # Generate table headers with styling
+    th = "".join(f'<th style="font-size: 11px; font-weight: bold;">{esc(c)}</th>' for c in cols)
     trs = []
     for _, r in df.iterrows():
-        tds = "".join(f"<td>{esc(r.get(c,''))}</td>" for c in cols)
-        trs.append(f"<tr>{tds}</tr>")
-    return f"""<table>
+        tds = []
+        for c in cols:
+            val = r.get(c, "")
+            # Format complexity with code tags
+            if c == "Complexity" and val:
+                val_lower = str(val).lower()
+                if val_lower in ['low', 'medium', 'high']:
+                    val = f"<code>{val_lower[0].upper()}</code>"
+            tds.append(f'<td style="font-size: 10px;">{esc(val)}</td>')
+        trs.append(f"<tr>{''.join(tds)}</tr>")
+    
+    # Dynamic colgroup with calculated widths
+    colgroup = "".join(f'<col style="width: {get_col_width(c, df[c])}"/>' for c in cols)
+    
+    return f"""<table class="confluenceTable" style="font-size: 10px; width: 100%;">
   <colgroup>
-    <col/> <col/> <col style="width:40%"/> <col/> <col/> <col/> <col/> <col/> <col/>
+    {colgroup}
   </colgroup>
-  <tbody>
+  <thead>
     <tr>{th}</tr>
+  </thead>
+  <tbody>
     {''.join(trs)}
   </tbody>
 </table>"""
@@ -51,34 +80,82 @@ def build_body(row, tasks_df: pd.DataFrame = None):
 <p>Child pages list the implementation options for this subcomponent.</p>
 """
     elif page_type == "Option":
+        # Format complexity with code tags
+        complexity_formatted = esc(complexity)
+        if complexity_formatted.lower() in ['low', 'medium', 'high']:
+            complexity_formatted = f"<code>{complexity_formatted[0].upper()}</code>"
+        
         body = f"""
 <h2>Option Overview</h2>
-<p>{esc(desc)}</p>
-<table>
-  <tr><th>Option Ref</th><td>{esc(code)}</td></tr>
-  <tr><th>Complexity</th><td>{esc(complexity)}</td></tr>
-  <tr><th>Mode Applicability</th><td>{esc(modes)}</td></tr>
-  <tr><th>Validation / Cleanup</th><td>{esc(flag)}</td></tr>
+<div style="margin-bottom: 15px;">
+  <p style="font-size: 12px; line-height: 1.4; margin-bottom: 10px;">{esc(desc)}</p>
+</div>
+
+<table class="confluenceTable" style="width: 100%; margin-bottom: 15px; font-size: 11px;">
+  <colgroup>
+    <col style="width: 25%;"/>
+    <col style="width: 75%;"/>
+  </colgroup>
+  <tbody>
+    <tr>
+      <th style="background-color: #f8f9fa; font-size: 10px; font-weight: bold; padding: 6px; border: 1px solid #ddd;">Option Ref</th>
+      <td style="font-size: 10px; padding: 6px; border: 1px solid #ddd;"><code>{esc(code)}</code></td>
+    </tr>
+    <tr>
+      <th style="background-color: #f8f9fa; font-size: 10px; font-weight: bold; padding: 6px; border: 1px solid #ddd;">Complexity</th>
+      <td style="font-size: 10px; padding: 6px; border: 1px solid #ddd;">{complexity_formatted}</td>
+    </tr>
+    <tr>
+      <th style="background-color: #f8f9fa; font-size: 10px; font-weight: bold; padding: 6px; border: 1px solid #ddd;">Mode Applicability</th>
+      <td style="font-size: 10px; padding: 6px; border: 1px solid #ddd;">{esc(modes)}</td>
+    </tr>
+    <tr>
+      <th style="background-color: #f8f9fa; font-size: 10px; font-weight: bold; padding: 6px; border: 1px solid #ddd;">Validation / Cleanup</th>
+      <td style="font-size: 10px; padding: 6px; border: 1px solid #ddd;">{esc(flag)}</td>
+    </tr>
+  </tbody>
 </table>
-<p>See child page <strong>Tasks – {esc(code)}</strong> for task breakdown.</p>
+
+<div style="background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 8px; margin-top: 15px;">
+  <p style="font-size: 11px; margin: 0; color: #1565c0;">
+    <strong>Next Steps:</strong> See child page <strong>Tasks – {esc(code)}</strong> for detailed task breakdown and implementation guidance.
+  </p>
+</div>
 """
     else:
         if tasks_df is not None and not tasks_df.empty:
             tasks_html = render_tasks_table(tasks_df, code)
             body = f"""
 <h2>Tasks for {esc(code)}</h2>
-<p>{esc(desc)}</p>
+<div style="margin-bottom: 15px;">
+  <p style="font-size: 12px; line-height: 1.4; margin-bottom: 10px;">{esc(desc)}</p>
+</div>
 {tasks_html}
 """
         else:
             body = f"""
 <h2>Tasks for {esc(code)}</h2>
-<p>{esc(desc)}</p>
-<table>
-  <tr>
-    <th>Task</th><th>Role</th><th>Complexity</th><th>MVP</th><th>Production</th><th>Enterprise</th>
-  </tr>
-  <tr><td colspan="6"><em>Populate from 'Blueprint_Tasks_Mapped_To_OptionRefs.csv' filtered by OptionRef = {esc(code)}.</em></td></tr>
+<div style="margin-bottom: 15px;">
+  <p style="font-size: 12px; line-height: 1.4; margin-bottom: 10px;">{esc(desc)}</p>
+</div>
+<table class="confluenceTable" style="width: 100%; font-size: 11px;">
+  <thead>
+    <tr>
+      <th style="background-color: #f8f9fa; font-size: 10px; font-weight: bold; padding: 6px; border: 1px solid #ddd;">Task</th>
+      <th style="background-color: #f8f9fa; font-size: 10px; font-weight: bold; padding: 6px; border: 1px solid #ddd;">Role</th>
+      <th style="background-color: #f8f9fa; font-size: 10px; font-weight: bold; padding: 6px; border: 1px solid #ddd;">Complexity</th>
+      <th style="background-color: #f8f9fa; font-size: 10px; font-weight: bold; padding: 6px; border: 1px solid #ddd;">MVP</th>
+      <th style="background-color: #f8f9fa; font-size: 10px; font-weight: bold; padding: 6px; border: 1px solid #ddd;">Production</th>
+      <th style="background-color: #f8f9fa; font-size: 10px; font-weight: bold; padding: 6px; border: 1px solid #ddd;">Enterprise</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="6" style="font-size: 10px; padding: 8px; border: 1px solid #ddd; text-align: center; font-style: italic;">
+        Populate from 'Blueprint_Tasks_Mapped_To_OptionRefs.csv' filtered by OptionRef = <code>{esc(code)}</code>.
+      </td>
+    </tr>
+  </tbody>
 </table>
 """
     return body

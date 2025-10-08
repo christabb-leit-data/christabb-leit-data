@@ -1,38 +1,26 @@
 [
   {
-    "Parent Page": "F.01 – Ingest",
-    "Page Title": "F.01.1 – CDC Ingestion",
-    "Page Type": "Subcomponent",
-    "Code / Ref": "F.01.1",
-    "Description / Notes": "**Purpose.** Continuously replicate source database changes (inserts, updates, deletes) into Snowflake with low latency so downstream models always work from current data.\n**Scope.** CDC is used for operational sources exposing changelogs (e.g., WAL/binlog/redo) or change tables. Complements batch loads (F.01.4) and streaming events (F.01.5).\n**Options.** F.01.1.A SaaS CDC Connector • F.01.1.B OpenFlow (Native CDC via Log) • F.01.1.C Custom CDC via Log Shipping.",
-    "Complexity": "",
-    "Mode Applicability": "",
-    "Validation / Cleanup Flag": "Viable",
-    "Labels": "blueprint;subcomponent;F.01",
-    "Recommended Action": "Update"
-  },
-  {
     "Parent Page": "F.01.1 – CDC Ingestion",
-    "Page Title": "F.01.1.B – OpenFlow (Native CDC via Log)",
+    "Page Title": "F.01.1.A – SaaS CDC Connector",
     "Page Type": "Option",
-    "Code / Ref": "F.01.1.B",
-    "Description / Notes": "Native log‑based CDC pipeline to Snowflake using OpenFlow.",
-    "Complexity": "High",
+    "Code / Ref": "F.01.1.A",
+    "Description / Notes": "**What it is.** A managed CDC service (e.g., Fivetran/Hevo/Hightouch) that extracts changes from source systems and lands them in Snowflake with schema‑drift handling, soft‑deletes, and scheduling controls.\n**When to use.** Fastest path to CDC with minimal engineering overhead; works well for MVP and production scenarios with vendor monitoring.\n**Trade‑offs.** Ongoing licensing/usage costs and less flexibility for niche sources or heavy customization.",
+    "Complexity": "Medium",
     "Mode Applicability": "",
     "Validation / Cleanup Flag": "Viable",
     "Labels": "blueprint;option;F.01",
-    "Recommended Action": "Update"
+    "Recommended Action": "Create or Update"
   },
   {
-    "Parent Page": "F.01.1.B – OpenFlow (Native CDC via Log)",
-    "Page Title": "Tasks – F.01.1.B",
+    "Parent Page": "F.01.1.A – SaaS CDC Connector",
+    "Page Title": "Tasks – F.01.1.A",
     "Page Type": "Tasks",
-    "Code / Ref": "F.01.1.B",
-    "Description / Notes": "Option Overview: Native log‑based CDC pipeline to Snowflake using OpenFlow.",
+    "Code / Ref": "F.01.1.A",
+    "Description / Notes": "Option Overview: **What it is.** A managed CDC service (e.g., Fivetran/Hevo/Hightouch) that extracts changes from source systems and lands them in Snowflake with schema‑drift handling, soft‑deletes, and scheduling controls. **When to use.** Fastest path to CDC with minimal engineering overhead; works well for MVP and production scenarios with vendor monitoring. **Trade‑offs.** Ongoing licensing/usage costs and less flexibility for niche sources or heavy customization.",
     "Complexity": "",
     "Mode Applicability": "",
     "Validation / Cleanup Flag": "",
     "Labels": "blueprint;tasks;F.01",
-    "Recommended Action": "Update"
+    "Recommended Action": "Create or Update"
   }
 ]
