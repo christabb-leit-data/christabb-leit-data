@@ -1,5 +1,5 @@
 {
-  "LEIT Data Platform Blueprint": {
+  "LEIT Platform Blueprint": {
     "id": "2690544828417"
   },
   "F.01 \u2013 Ingest": {
@@ -7,5 +7,26 @@
   },
   "F.01.1 \u2013 CDC Ingestion": {
     "id": "2690560000095"
+  },
+  "F.01.1.B \u2013 OpenFlow (Native CDC via Log)": {
+    "id": "2690560000297"
+  },
+  "Tasks \u2013 F.01.1.B": {
+    "id": "2690560196687"
+  },
+  "F.01.1.A \u2013 SaaS CDC Connector": {
+    "id": "2690560196627"
+  },
+  "F.01.1.C \u2013 Custom CDC via Log Shipping": {
+    "id": "2690560000138"
+  },
+  "Tasks \u2013 F.01.1.A": {
+    "id": "2690560000183"
+  },
+  "Tasks \u2013 F.01.1.C": {
+    "id": "2690560196702"
+  },
+  "F.01.1.B \u2013 Open\u2011Source CDC Pipeline": {
+    "id": "2690562818379"
   }
 }

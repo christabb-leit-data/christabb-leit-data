@@ -1,27 +1,6 @@
 Parent Page,Page Title,Page Type,Code / Ref,Description / Notes,Complexity,Mode Applicability,Validation / Cleanup Flag,Labels,Recommended Action
 F.01 – Ingest,F.01.1 – CDC Ingestion,Subcomponent,F.01.1,"**Purpose.** Continuously replicate source database changes (inserts, updates, deletes) into Snowflake with low latency so downstream models always work from current data.
-
-**Scope.** CDC is used for operational sources that expose changelogs (e.g., WAL/binlog/redo) or change tables. It complements batch loads (F.01.4) and streaming events (F.01.5).
-
-**Options available (implemented as sub‑pages):**
-- **F.01.1.A – SaaS CDC Connector:** Managed log‑based replication service into Snowflake (fastest path, low ops).
-- **F.01.1.B – Open‑Source CDC Pipeline:** Debezium/Kafka (or equivalent) streaming into Snowflake for full control.
-- **F.01.1.C – Custom CDC via Log Shipping:** Bespoke log parsing + apply for niche/complex sources.
-
-**Non‑goals.** Point‑in‑time full reloads (covered by F.01.4 batch) and API‑push ingestion (F.01.2).
-",,,Viable,blueprint;subcomponent;F.01,Create or Update
-F.01.1 – CDC Ingestion,F.01.1.A – SaaS CDC Connector,Option,F.01.1.A,"**What it is.** A managed CDC service (e.g., Fivetran/HVR/Qlik Replicate‑as‑a‑Service) reads source DB logs and continuously lands changes into Snowflake.
-**Why choose it.** Fastest path to CDC with minimal code and strong vendor monitoring; ideal for MVP and many production cases.
-**Trade‑offs.** Ongoing license/usage costs and less flexibility for unusual sources or edge‑case transformations.
-",Medium,MVP:✅ Prod:✅ Ent:✅,Viable,blueprint;option;F.01,Create or Update
-F.01.1.A – SaaS CDC Connector,Tasks – F.01.1.A,Tasks,F.01.1.A,Tasks filtered by OptionRef=F.01.1.A.,,,,blueprint;tasks;F.01,Create or Update
-F.01.1 – CDC Ingestion,F.01.1.B – Open‑Source CDC Pipeline,Option,F.01.1.B,"**What it is.** An in‑house CDC pipeline built on open‑source (e.g., Debezium + Kafka + Snowflake sink/Snowpipe Streaming).
-**Why choose it.** Maximum control over throughput, schema evolution, routing, and replay; avoids vendor lock‑in.
-**Trade‑offs.** Higher engineering and DevOps overhead to operate reliably at scale.
-",High,MVP:❌ Prod:✅ Ent:✅,Viable,blueprint;option;F.01,Create or Update
-F.01.1.B – Open‑Source CDC Pipeline,Tasks – F.01.1.B,Tasks,F.01.1.B,Tasks filtered by OptionRef=F.01.1.B.,,,,blueprint;tasks;F.01,Create or Update
-F.01.1 – CDC Ingestion,F.01.1.C – Custom CDC via Log Shipping,Option,F.01.1.C,"**What it is.** Fully bespoke CDC: parse DB logs or change tables and apply changes to Snowflake with custom code.
-**Why choose it.** Only when SaaS/Open‑source cannot meet unique constraints (legacy DBs, bespoke rules).
-**Trade‑offs.** Highest complexity and maintenance responsibility; build full reliability yourself.
-",High,MVP:❌ Prod:⚙️ Ent:✅,Viable,blueprint;option;F.01,Create or Update
-F.01.1.C – Custom CDC via Log Shipping,Tasks – F.01.1.C,Tasks,F.01.1.C,Tasks filtered by OptionRef=F.01.1.C.,,,,blueprint;tasks;F.01,Create or Update
+**Scope.** CDC is used for operational sources exposing changelogs (e.g., WAL/binlog/redo) or change tables. Complements batch loads (F.01.4) and streaming events (F.01.5).
+**Options.** F.01.1.A SaaS CDC Connector • F.01.1.B OpenFlow (Native CDC via Log) • F.01.1.C Custom CDC via Log Shipping.",,,Viable,blueprint;subcomponent;F.01,Update
+F.01.1 – CDC Ingestion,F.01.1.B – OpenFlow (Native CDC via Log),Option,F.01.1.B,Native log‑based CDC pipeline to Snowflake using OpenFlow.,High,,Viable,blueprint;option;F.01,Update
+F.01.1.B – OpenFlow (Native CDC via Log),Tasks – F.01.1.B,Tasks,F.01.1.B,Option Overview: Native log‑based CDC pipeline to Snowflake using OpenFlow.,,,,blueprint;tasks;F.01,Update
