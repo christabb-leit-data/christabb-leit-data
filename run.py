@@ -5,64 +5,76 @@ from utils.confluence_api import ConfluenceAPI
 
 REQ_PLAN_COLS = ["Parent Page","Page Title","Page Type","Code / Ref","Description / Notes","Complexity","Mode Applicability","Validation / Cleanup Flag","Labels","Recommended Action"]
 
-def esc(s): return html.escape(str(s) if s is not None else "")
+def _esc(s) -> str:
+    return html.escape("" if s is None else str(s))
+
+def _complexity_code(val: str) -> str:
+    """Normalize complexity to codes: L, M, H (fallback to original)."""
+    m = (val or "").strip().lower()
+    return {
+        "low": "L", "l": "L",
+        "medium": "M", "m": "M",
+        "high": "H", "h": "H",
+    }.get(m, (val or "").strip())
+
+def esc(s): return _esc(s)
 
 def render_tasks_table(tasks_df: pd.DataFrame, option_ref: str) -> str:
-    # Handle both "OptionRef" and "Option Ref" column names
+    """
+    Render a tasks table for a single option with:
+      • dynamic columns (based on CSV)
+      • L/M/H complexity codes (with hover tooltip to show word)
+      • smaller fonts and tighter padding so it fits on Confluence pages
+    """
+    # Filter tasks for the target option (handle both "OptionRef" and "Option Ref" column names)
     option_col = "OptionRef" if "OptionRef" in tasks_df.columns else "Option Ref"
     df = tasks_df[tasks_df[option_col] == option_ref].copy()
     if df.empty:
-        return f"<p><em>No tasks found for OptionRef {esc(option_ref)}.</em></p>"
-    
-    # Exclude specific columns and the option reference column
-    exclude_cols = {option_col, "Orchestration Integration", "Monitoring & Alerting", "Schedule / Frequency", "Notes"}
-    cols = [c for c in df.columns if c not in exclude_cols]
-    
-    # Calculate column widths based on content
-    def get_col_width(col_name, col_data):
-        # Base width on column name and content length
-        name_len = len(col_name)
-        max_content_len = max([len(str(val)) for val in col_data if val], default=0)
-        # Use the larger of name length or average content length, with min/max bounds
-        avg_len = max(name_len, max_content_len // max(len(col_data), 1))
-        if col_name in ["Description", "Deliverables", "Acceptance Criteria"]:
-            return "25%"  # Wider for descriptive columns
-        elif col_name in ["Task ID", "Complexity", "Primary Role"]:
-            return "8%"   # Narrower for short columns
-        elif col_name in ["Title", "Predecessors", "Client Dependencies"]:
-            return "15%"  # Medium width
-        else:
-            return "12%"  # Default medium width
-    
-    # Generate table headers with styling
-    th = "".join(f'<th style="font-size: 11px; font-weight: bold;">{esc(c)}</th>' for c in cols)
-    trs = []
-    for _, r in df.iterrows():
-        tds = []
-        for c in cols:
-            val = r.get(c, "")
-            # Format complexity with code tags
-            if c == "Complexity" and val:
-                val_lower = str(val).lower()
-                if val_lower in ['low', 'medium', 'high']:
-                    val = f"<code>{val_lower[0].upper()}</code>"
-            tds.append(f'<td style="font-size: 10px;">{esc(val)}</td>')
-        trs.append(f"<tr>{''.join(tds)}</tr>")
-    
-    # Dynamic colgroup with calculated widths
-    colgroup = "".join(f'<col style="width: {get_col_width(c, df[c])}"/>' for c in cols)
-    
-    return f"""<table class="confluenceTable" style="font-size: 10px; width: 100%;">
-  <colgroup>
-    {colgroup}
-  </colgroup>
-  <thead>
-    <tr>{th}</tr>
-  </thead>
-  <tbody>
-    {''.join(trs)}
-  </tbody>
-</table>"""
+        return f"<p><em>No tasks found for OptionRef {html.escape(option_ref)}.</em></p>"
+
+    # Preferred order; we will include what exists in the CSV in this order
+    preferred = [
+        "Task ID", "Task Title", "Task Description",
+        "Complexity", "Primary Role", "Notes",
+        "Predecessors", "Client Dependencies", "Deliverables", "Acceptance Criteria",
+        "Orchestration Integration", "Monitoring & Alerting", "Schedule / Frequency",
+        # legacy/optional columns (render only if present)
+        "MVP", "Production", "Enterprise",
+    ]
+    cols = [c for c in preferred if c in df.columns]
+    df = df[cols].copy()
+
+    # Build header (tighter padding)
+    thead = "".join(
+        f'<th style="padding:4px 6px;">{_esc(c)}</th>'
+        for c in df.columns
+    )
+
+    # Build body
+    rows = []
+    for _, row in df.iterrows():
+        cells_html = []
+        for c in df.columns:
+            v = row[c]
+            # Complexity column -> normalize to L/M/H codes + tooltip
+            if c == "Complexity":
+                code = _complexity_code(v)
+                long = {"L": "Low", "M": "Medium", "H": "High"}.get(code, str(v or ""))
+                cell_html = f'<abbr title="{_esc(long)}">{_esc(code)}</abbr>'
+            else:
+                cell_html = _esc(v)
+            cells_html.append(
+                f'<td style="padding:4px 6px; vertical-align:top; word-break:break-word; white-space:normal;">{cell_html}</td>'
+            )
+        rows.append("<tr>" + "".join(cells_html) + "</tr>")
+
+    # Smaller fonts + full-width table
+    return (
+        '<div class="leit-tasks" style="font-size:12px; line-height:1.35;">'
+        '<table style="border-collapse:collapse; table-layout:fixed; width:100%;">'
+        f"<thead><tr>{thead}</tr></thead><tbody>{''.join(rows)}</tbody></table>"
+        "</div>"
+    )
 
 def build_body(row, tasks_df: pd.DataFrame = None):
     page_type = row.get("Page Type","")
@@ -81,9 +93,7 @@ def build_body(row, tasks_df: pd.DataFrame = None):
 """
     elif page_type == "Option":
         # Format complexity with code tags
-        complexity_formatted = esc(complexity)
-        if complexity_formatted.lower() in ['low', 'medium', 'high']:
-            complexity_formatted = f"<code>{complexity_formatted[0].upper()}</code>"
+        complexity_formatted = f"<code>{_complexity_code(complexity)}</code>"
         
         body = f"""
 <h2>Option Overview</h2>
