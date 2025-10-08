@@ -5,6 +5,8 @@ from utils.confluence_api import ConfluenceAPI
 
 REQ_PLAN_COLS = ["Parent Page","Page Title","Page Type","Code / Ref","Description / Notes","Complexity","Mode Applicability","Validation / Cleanup Flag","Labels","Recommended Action"]
 
+DROP_COLS = {"Orchestration Integration", "Monitoring & Alerting", "Schedule / Frequency"}
+
 def _esc(s) -> str:
     return html.escape("" if s is None else str(s))
 
@@ -20,60 +22,45 @@ def _complexity_code(val: str) -> str:
 def esc(s): return _esc(s)
 
 def render_tasks_table(tasks_df: pd.DataFrame, option_ref: str) -> str:
-    """
-    Render a tasks table for a single option with:
-      • dynamic columns (based on CSV)
-      • L/M/H complexity codes (with hover tooltip to show word)
-      • smaller fonts and tighter padding so it fits on Confluence pages
-    """
-    # Filter tasks for the target option (handle both "OptionRef" and "Option Ref" column names)
-    option_col = "OptionRef" if "OptionRef" in tasks_df.columns else "Option Ref"
-    df = tasks_df[tasks_df[option_col] == option_ref].copy()
+    df = tasks_df[tasks_df.get("OptionRef") == option_ref].copy()
     if df.empty:
         return f"<p><em>No tasks found for OptionRef {html.escape(option_ref)}.</em></p>"
 
-    # Preferred order; we will include what exists in the CSV in this order
     preferred = [
-        "Task ID", "Task Title", "Task Description",
-        "Complexity", "Primary Role", "Notes",
-        "Predecessors", "Client Dependencies", "Deliverables", "Acceptance Criteria",
-        "Orchestration Integration", "Monitoring & Alerting", "Schedule / Frequency",
-        # legacy/optional columns (render only if present)
-        "MVP", "Production", "Enterprise",
+        "Task ID","Task Title","Task Description","Complexity","Primary Role","Notes",
+        "Predecessors","Client Dependencies","Deliverables","Acceptance Criteria",
+        # legacy optional:
+        "Orchestration Integration","Monitoring & Alerting","Schedule / Frequency",
+        "MVP","Production","Enterprise",
     ]
     cols = [c for c in preferred if c in df.columns]
     df = df[cols].copy()
 
-    # Build header (tighter padding)
-    thead = "".join(
-        f'<th style="padding:4px 6px;">{_esc(c)}</th>'
-        for c in df.columns
-    )
+    # Clean up values and drop unwanted columns defensively (even if a future CSV reintroduces them)
+    df = df.replace({pd.NA: "", None: ""}).fillna("")
+    df = df[[c for c in df.columns if c not in DROP_COLS]]
 
-    # Build body
+    thead = "".join(f'<th style="padding:4px 6px;">{_esc(c)}</th>' for c in df.columns)
     rows = []
-    for _, row in df.iterrows():
-        cells_html = []
+    for _, r in df.iterrows():
+        tds = []
         for c in df.columns:
-            v = row[c]
-            # Complexity column -> normalize to L/M/H codes + tooltip
+            v = r[c]
             if c == "Complexity":
                 code = _complexity_code(v)
-                long = {"L": "Low", "M": "Medium", "H": "High"}.get(code, str(v or ""))
-                cell_html = f'<abbr title="{_esc(long)}">{_esc(code)}</abbr>'
+                long = {"L":"Low","M":"Medium","H":"High"}.get(code, str(v or ""))
+                cell = f'<abbr title="{_esc(long)}">{_esc(code)}</abbr>'
             else:
-                cell_html = _esc(v)
-            cells_html.append(
-                f'<td style="padding:4px 6px; vertical-align:top; word-break:break-word; white-space:normal;">{cell_html}</td>'
-            )
-        rows.append("<tr>" + "".join(cells_html) + "</tr>")
+                cell = _esc(v)
+            tds.append(f'<td style="padding:4px 6px; vertical-align:top; word-break:break-word; white-space:normal;">{cell}</td>')
+        rows.append("<tr>" + "".join(tds) + "</tr>")
 
-    # Smaller fonts + full-width table
+    # Small font wrapper so it fits the page
     return (
-        '<div class="leit-tasks" style="font-size:12px; line-height:1.35;">'
+        '<small><div class="leit-tasks" style="font-size:12px; line-height:1.35;">'
         '<table style="border-collapse:collapse; table-layout:fixed; width:100%;">'
         f"<thead><tr>{thead}</tr></thead><tbody>{''.join(rows)}</tbody></table>"
-        "</div>"
+        "</div></small>"
     )
 
 def build_body(row, tasks_df: pd.DataFrame = None):
