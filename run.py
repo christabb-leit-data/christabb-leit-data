@@ -9,12 +9,12 @@ REQ_PLAN_COLS = ["Parent Page","Page Title","Page Type","Code / Ref","Descriptio
 
 HEADER_ALIASES = {
     "Task ID": "ID",
-    "Task Title": "Title",
-    "Task Description": "Description",
+    "Task Title": "Title", 
+    "Task Description": "Desc",
     "Primary Role": "Role",
     "Client Dependencies": "Client Deps",
     "Acceptance Criteria": "Acceptance",
-    "Predecessors": "Pre-reqs",
+    "Predecessors": "Dep",
 }
 DROP_COLS = {
     "Orchestration Integration",
